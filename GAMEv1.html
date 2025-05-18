@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cup Gamble Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      text-align: center;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .game-container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+      max-width: 650px;
+      width: 100%;
+    }
+    h2 {
+      color: #2c3e50;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .btn {
+      padding: 12px 24px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #3498db;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+    .btn:hover {
+      background: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+    }
+    .btn:active {
+      transform: translateY(0);
+    }
+    .btn:disabled {
+      background: #bdc3c7;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .cup-buttons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      gap: 15px;
+    }
+    .cup-btn {
+      margin: 5px;
+      font-size: 20px;
+      background: #f8f9fa;
+      border: 2px solid #dee2e6;
+      color: #333;
+      border-radius: 8px;
+      padding: 15px 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .cup-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .cup-btn.selected {
+      background: #d4f1f9;
+      border-color: #0c5460;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .result {
+      margin: 15px 0;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 8px;
+      animation: fadeIn 0.5s;
+    }
+    .score-change {
+      font-size: 24px;
+      font-weight: bold;
+      animation: scoreUpdate 1s;
+      display: inline-block;
+      margin-left: 10px;
+    }
+    .success {
+      background-color: rgba(46, 204, 113, 0.2);
+      color: #27ae60;
+    }
+    .error {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #c0392b;
+    }
+    .neutral {
+      background-color: rgba(189, 195, 199, 0.2);
+      color: #7f8c8d;
+    }
+    .hidden {
+      display: none;
+    }
+    .how-to-play {
+      text-align: left;
+      margin-bottom: 20px;
+      background: #f0f8ff;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+    }
+    .game-info {
+      display: flex;
+      justify-content: space-around;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .game-info p {
+      margin: 5px 0;
+    }
+    .note {
+      background-color: #fffde7;
+      border-left: 4px solid #fbc02d;
+      padding: 10px 15px;
+      margin-top: 15px;
+      font-size: 14px;
+      text-align: left;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scoreUpdate {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.5); }
+      100% { transform: scale(1); }
+    }
+    #scoreDisplay {
+      transition: color 0.5s;
+    }
+    @media (max-width: 600px) {
+      .game-container {
+        padding: 15px;
+      }
+      .cup-buttons {
+        gap: 5px;
+      }
+      .cup-btn {
+        font-size: 16px;
+        padding: 10px 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="game-container">
+  <h2 id="gameTitle">Cup Gamble Game - Part 1</h2>
+
+  <div id="instructions" class="how-to-play"></div>
+
+  <div class="game-info">
+    <p><strong>Round:</strong> <span id="roundDisplay">1</span>/5</p>
+    <p><strong>Score:</strong> <span id="scoreDisplay">0</span> <span id="scoreChange" class="score-change"></span></p>
+  </div>
+
+  <div id="gameArea">
+    <p id="prompt">Pick a cup:</p>
+    <div class="cup-buttons" id="cupButtons"></div>
+    <div>
+      <button class="btn" id="playBtn" disabled>Play</button>
+      <button class="btn" id="skipBtn">Skip</button>
+    </div>
+    <div class="result" id="resultMsg"></div>
+  </div>
+
+  <div id="finalArea" class="hidden">
+    <h3>End of Part 1</h3>
+    <p id="finalMessage"></p>
+    <button class="btn" id="startPart2Btn">Start Part 2</button>
+  </div>
+
+  <div id="endGameArea" class="hidden">
+    <h3>Game Completed!</h3>
+    <p id="endMessage"></p>
+    <button class="btn" id="restartBtn">Restart Game</button>
+  </div>
+</div>
+
+<script>
+  // Game state
+  const gameState = {
+    part: 1,
+    round: 1,
+    score: 0,
+    selectedCup: 0,
+    part1Score: 0,
+    part2Score: 0,
+    part1Played: 0,
+    part1Skipped: 0,
+    part2Played: 0,
+    part2Skipped: 0,
+    part2CupMap: [2, 3, 5, 3, 5]
+  };
+
+  // Cache DOM elements
+  const elements = {
+    instructions: document.getElementById("instructions"),
+    roundDisplay: document.getElementById("roundDisplay"),
+    scoreDisplay: document.getElementById("scoreDisplay"),
+    scoreChange: document.getElementById("scoreChange"),
+    resultMsg: document.getElementById("resultMsg"),
+    playBtn: document.getElementById("playBtn"),
+    skipBtn: document.getElementById("skipBtn"),
+    cupButtons: document.getElementById("cupButtons"),
+    prompt: document.getElementById("prompt"),
+    gameArea: document.getElementById("gameArea"),
+    finalArea: document.getElementById("finalArea"),
+    endGameArea: document.getElementById("endGameArea"),
+    gameTitle: document.getElementById("gameTitle"),
+    finalMessage: document.getElementById("finalMessage"),
+    endMessage: document.getElementById("endMessage")
+  };
+
+  // Add event listeners
+  elements.playBtn.addEventListener("click", playRound);
+  elements.skipBtn.addEventListener("click", skipRound);
+  document.getElementById("startPart2Btn").addEventListener("click", startPart2);
+  document.getElementById("restartBtn").addEventListener("click", () => location.reload());
+
+  // Helper functions
+  function showInstructions() {
+    const whatsappNote = `
+      <div class="note">
+        <strong>Important:</strong> Participants are requested to screenshot the end result and send it on WhatsApp to 9665526369 and show the score added deducted after each round.
+      </div>
+    `;
+    
+    if (gameState.part === 1) {
+      elements.instructions.innerHTML = `
+        <h3>How to Play - Part 1</h3>
+        <ul>
+          <li>Each round has 3 cups, only one has a winning token.</li>
+          <li>Select the correct cup: +3 points</li>
+          <li>Wrong guess: 0 points</li>
+          <li>Skip the round: +1 point guaranteed</li>
+        </ul>
+        ${whatsappNote}
+      `;
+    } else {
+      elements.instructions.innerHTML = `
+        <h3>How to Play - Part 2</h3>
+        <ul>
+          <li>You start with 20 points.</li>
+          <li>Each round has a different number of cups.</li>
+          <li>Only 1 cup is safe (0), others have random negative values (-2 to -5).</li>
+          <li>Select a cup: score is reduced by the selected cup's value.</li>
+          <li>Skip: lose 1 point guaranteed.</li>
+        </ul>
+        ${whatsappNote}
+      `;
+    }
+  }
+
+  function renderCups(count) {
+    elements.cupButtons.innerHTML = "";
+    for (let i = 1; i <= count; i++) {
+      const btn = document.createElement("button");
+      btn.className = "cup-btn";
+      btn.innerHTML = `🥤 Cup ${i}`;
+      btn.dataset.cupId = i;
+      elements.cupButtons.appendChild(btn);
+    }
+
+    // Event delegation for cup buttons
+    elements.cupButtons.addEventListener("click", (e) => {
+      if (e.target.classList.contains("cup-btn")) {
+        const cupId = parseInt(e.target.dataset.cupId);
+        selectCup(cupId, e.target);
+      }
+    });
+  }
+
+  function selectCup(cupId, btnElement) {
+    gameState.selectedCup = cupId;
+    document.querySelectorAll(".cup-btn").forEach(b => b.classList.remove("selected"));
+    btnElement.classList.add("selected");
+    elements.playBtn.disabled = false;
+  }
+
+  function updateDisplay() {
+    elements.roundDisplay.textContent = gameState.round;
+    elements.scoreDisplay.textContent = gameState.score;
+    elements.resultMsg.textContent = "";
+    elements.resultMsg.className = "result";
+    elements.playBtn.disabled = true;
+    elements.scoreChange.textContent = "";
+  }
+
+  function showScoreChange(amount) {
+    elements.scoreChange.textContent = amount > 0 ? `+${amount}` : amount;
+    elements.scoreChange.style.color = amount > 0 ? "#27ae60" : amount < 0 ? "#c0392b" : "#7f8c8d";
+    
+    // Reset animation
+    elements.scoreChange.style.animation = 'none';
+    elements.scoreChange.offsetHeight; // Trigger reflow
+    elements.scoreChange.style.animation = 'scoreUpdate 1s';
+  }
+
+  function playRound() {
+    if (gameState.selectedCup === 0) return;
+    
+    const totalCups = (gameState.part === 1) ? 3 : gameState.part2CupMap[gameState.round - 1];
+    let correct = Math.floor(Math.random() * totalCups) + 1;
+
+    if (gameState.part === 1) {
+      gameState.part1Played++;
+      if (gameState.selectedCup === correct) {
+        showScoreChange(+3);
+        gameState.score += 3;
+        elements.resultMsg.textContent = "Correct! +3 points.";
+        elements.resultMsg.className = "result success";
+      } else {
+        showScoreChange(0);
+        elements.resultMsg.textContent = `Wrong! Correct cup was ${correct}. +0 points.`;
+        elements.resultMsg.className = "result error";
+      }
+    } else {
+      gameState.part2Played++;
+      const penalties = Array.from({length: totalCups}, () => -Math.floor(Math.random() * 4 + 2));
+      penalties[correct - 1] = 0;
+      const deduction = penalties[gameState.selectedCup - 1];
+      
+      showScoreChange(deduction);
+      gameState.score += deduction;
+      
+      elements.resultMsg.textContent = deduction === 0 ? 
+        "Safe! No point lost." : 
+        `Bad luck! You lost ${-deduction} points.`;
+      elements.resultMsg.className = deduction === 0 ? "result success" : "result error";
+    }
+
+    advanceRound();
+  }
+
+  function skipRound() {
+    if (gameState.part === 1) {
+      showScoreChange(+1);
+      gameState.score += 1;
+      gameState.part1Skipped++;
+      elements.resultMsg.textContent = "+1 point for skipping.";
+      elements.resultMsg.className = "result neutral";
+    } else {
+      showScoreChange(-1);
+      gameState.score -= 1;
+      gameState.part2Skipped++;
+      elements.resultMsg.textContent = "-1 point for skipping.";
+      elements.resultMsg.className = "result error";
+    }
+    advanceRound();
+  }
+
+  function advanceRound() {
+    gameState.selectedCup = 0;
+    gameState.round++;
+    
+    if ((gameState.part === 1 && gameState.round > 5) || (gameState.part === 2 && (gameState.round > 5 || gameState.score <= 0))) {
+      if (gameState.part === 1) {
+        gameState.part1Score = gameState.score;
+        elements.gameArea.classList.add("hidden");
+        elements.finalArea.classList.remove("hidden");
+        elements.finalMessage.innerText = `Part 1 Score: ${gameState.part1Score}`;
+      } else {
+        gameState.part2Score = gameState.score;
+        elements.gameArea.classList.add("hidden");
+        elements.endGameArea.classList.remove("hidden");
+
+        elements.endMessage.innerHTML = `
+          <p><strong>Final Score:</strong></p>
+          <p>Part 1: ${gameState.part1Score} points</p>
+          <p>Part 2: ${gameState.part2Score} points</p>
+          <hr/>
+          <p><strong>Stats:</strong></p>
+          <p>Part 1 - Played: ${gameState.part1Played}, Skipped: ${gameState.part1Skipped}</p>
+          <p>Part 2 - Played: ${gameState.part2Played}, Skipped: ${gameState.part2Skipped}</p>
+          <hr/>
+          <p><strong>Total Score:</strong> ${gameState.part1Score + gameState.part2Score} points</p>
+        `;
+      }
+    } else {
+      setTimeout(() => {
+        startRound();
+      }, 1500); // Delay to allow player to see results
+    }
+  }
+
+  function startPart2() {
+    gameState.part = 2;
+    gameState.round = 1;
+    gameState.score = 20;
+    gameState.selectedCup = 0;
+    elements.finalArea.classList.add("hidden");
+    elements.gameArea.classList.remove("hidden");
+    elements.gameTitle.textContent = "Cup Gamble Game - Part 2";
+    startRound();
+  }
+
+  function startRound() {
+    showInstructions();
+    const totalCups = (gameState.part === 1) ? 3 : gameState.part2CupMap[gameState.round - 1];
+    
+    // Clear existing event listeners before rendering new cups
+    const oldCupButtons = elements.cupButtons;
+    const newCupButtons = oldCupButtons.cloneNode(false);
+    oldCupButtons.parentNode.replaceChild(newCupButtons, oldCupButtons);
+    elements.cupButtons = newCupButtons;
+    
+    renderCups(totalCups);
+    updateDisplay();
+    elements.prompt.textContent = `Pick a cup (1 to ${totalCups}):`;
+  }
+
+  // Start the game
+  startRound();
+</script>
+
+</body>
+</html>
