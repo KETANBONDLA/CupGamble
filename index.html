@@ -2,271 +2,413 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Cup Gamble Game</title>
   <meta name="theme-color" content="#3498db">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <style>
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2980b9;
+      --success-color: #27ae60;
+      --error-color: #c0392b;
+      --neutral-color: #7f8c8d;
+      --background-color: #f5f7fa;
+      --card-color: #ffffff;
+      --text-color: #2c3e50;
+    }
+
     * {
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-    body {
+      margin: 0;
+      padding: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      text-align: center;
-      padding: 10px;
+    }
+
+    body {
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.6;
+      padding: 20px;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      margin: 0;
-      line-height: 1.6;
     }
+
     .game-container {
-      background: white;
-      padding: min(30px, 5vw);
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-      max-width: 650px;
+      background-color: var(--card-color);
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      max-width: 600px;
       width: 100%;
-      overflow-x: hidden;
+      position: relative;
+      overflow: hidden;
     }
+
     h2 {
-      color: #2c3e50;
-      margin-top: 0;
+      color: var(--primary-color);
+      text-align: center;
       margin-bottom: 20px;
-      font-size: clamp(1.5rem, 5vw, 2rem);
+      font-size: 28px;
+      position: relative;
     }
+
+    h2::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 3px;
+      background-color: var(--primary-color);
+      margin: 10px auto 0;
+      border-radius: 2px;
+    }
+
     h3 {
-      font-size: clamp(1.2rem, 4vw, 1.5rem);
+      margin: 15px 0;
+      color: var(--primary-color);
     }
+
+    .how-to-play {
+      background-color: rgba(52, 152, 219, 0.1);
+      border-left: 4px solid var(--primary-color);
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .how-to-play h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+      font-size: 18px;
+    }
+
+    .how-to-play ul {
+      padding-left: 20px;
+      margin: 10px 0;
+    }
+
+    .note {
+      background-color: rgba(241, 196, 15, 0.1);
+      border-left: 4px solid #f1c40f;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 0 4px 4px 0;
+      font-size: 14px;
+    }
+
+    .game-info {
+      display: flex;
+      justify-content: space-between;
+      background-color: rgba(52, 152, 219, 0.05);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      font-size: 18px;
+      position: relative;
+    }
+
+    #scoreDisplay {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .score-change {
+      position: absolute;
+      right: 15px;
+      top: 5px;
+      font-weight: bold;
+      opacity: 0;
+    }
+
+    @keyframes scoreUpdate {
+      0% { opacity: 0; transform: translateY(0); }
+      20% { opacity: 1; transform: translateY(-15px); }
+      80% { opacity: 1; transform: translateY(-15px); }
+      100% { opacity: 0; transform: translateY(-30px); }
+    }
+
+    #prompt {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    /* Cup buttons styling enhancements */
+    .cup-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .cup-btn {
+      background-color: white;
+      border: 2px solid var(--primary-color);
+      border-radius: 10px;
+      padding: 35px 15px;
+      min-width: 100px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+      touch-action: manipulation; /* Improve touch response */
+    }
+
+    .cup-btn::before {
+      content: "🥤";
+      font-size: 36px;
+      margin-bottom: 8px;
+      display: block;
+      transform: translateY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .cup-btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .cup-btn.selected {
+      background-color: var(--primary-color);
+      color: white;
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+    }
+
+    .cup-btn.selected::before {
+      transform: translateY(-5px) scale(1.1);
+    }
+
+    .cup-btn.reveal-success {
+      background-color: var(--success-color);
+      color: white;
+      border-color: var(--success-color);
+      animation: cup-bounce 0.5s ease;
+    }
+
+    .cup-btn.reveal-error {
+      background-color: var(--error-color);
+      color: white;
+      border-color: var(--error-color);
+      animation: cup-shake 0.5s ease;
+    }
+
+    @keyframes cup-bounce {
+      0%, 100% { transform: translateY(-5px); }
+      50% { transform: translateY(-15px); }
+    }
+
+    @keyframes cup-shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    /* Button styling enhancements */
     .btn {
-      padding: min(12px, 3vw) min(24px, 6vw);
-      margin: 10px 5px;
+      background-color: var(--primary-color);
+      color: white;
       border: none;
       border-radius: 8px;
-      background: #3498db;
-      color: white;
-      font-size: clamp(0.9rem, 4vw, 1rem);
+      padding: 12px 24px;
+      font-size: 16px;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      font-weight: 600;
+      box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+      -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
-      -webkit-appearance: none;
-      user-select: none;
     }
-    .btn:hover {
-      background: #2980b9;
+
+    .btn:hover, .btn.touch-active {
+      background-color: var(--secondary-color);
       transform: translateY(-2px);
-      box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+      box-shadow: 0 6px 8px rgba(52, 152, 219, 0.3);
     }
+
     .btn:active {
       transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
     }
+
     .btn:disabled {
-      background: #bdc3c7;
+      background-color: var(--neutral-color);
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
     }
-    .cup-buttons {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-      gap: min(15px, 2vw);
+
+    #skipBtn {
+      background-color: transparent;
+      color: var(--primary-color);
+      border: 2px solid var(--primary-color);
+      box-shadow: none;
     }
-    .cup-btn {
-      flex: 1 0 calc(33.333% - 20px);
-      min-width: min(100px, 25vw);
-      max-width: min(150px, 40vw);
-      margin: 5px;
-      font-size: clamp(0.9rem, 4vw, 1.25rem);
-      background: #f8f9fa;
-      border: 2px solid #dee2e6;
-      color: #333;
-      border-radius: 8px;
-      padding: min(15px, 4vw) min(20px, 5vw);
-      cursor: pointer;
-      transition: all 0.2s ease;
-      touch-action: manipulation;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+
+    #skipBtn:hover {
+      background-color: rgba(52, 152, 219, 0.1);
     }
-    .cup-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .cup-btn.selected {
-      background: #d4f1f9;
-      border-color: #0c5460;
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    }
-    .button-container {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
+
     .result {
-      margin: 15px 0;
-      font-weight: bold;
-      padding: 10px;
+      text-align: center;
+      padding: 15px;
       border-radius: 8px;
-      animation: fadeIn 0.5s;
-      font-size: clamp(0.9rem, 4vw, 1rem);
+      margin-top: 20px;
+      font-weight: 500;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      height: 55px;
     }
-    .score-change {
-      font-size: clamp(1.2rem, 5vw, 1.5rem);
-      font-weight: bold;
-      animation: scoreUpdate 1s;
-      display: inline-block;
-      margin-left: 10px;
+
+    .result.active {
+      opacity: 1;
     }
-    .success {
-      background-color: rgba(46, 204, 113, 0.2);
-      color: #27ae60;
+
+    .result.success {
+      background-color: rgba(39, 174, 96, 0.1);
+      color: var(--success-color);
+      border-left: 4px solid var(--success-color);
     }
-    .error {
-      background-color: rgba(231, 76, 60, 0.2);
-      color: #c0392b;
+
+    .result.error {
+      background-color: rgba(192, 57, 43, 0.1);
+      color: var(--error-color);
+      border-left: 4px solid var(--error-color);
     }
-    .neutral {
-      background-color: rgba(189, 195, 199, 0.2);
-      color: #7f8c8d;
-    }
+
     .hidden {
       display: none;
     }
-    .how-to-play {
-      text-align: left;
-      margin-bottom: 20px;
-      background: #f0f8ff;
-      padding: 15px;
-      border-radius: 8px;
-      border-left: 4px solid #3498db;
-      font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+
+    #finalArea, #endGameArea {
+      text-align: center;
+      padding: 20px;
     }
-    .how-to-play h3 {
-      margin-top: 0;
+
+    #finalMessage, #endMessage {
+      margin: 20px 0;
+      line-height: 1.8;
+      font-size: 18px;
     }
-    .how-to-play ul {
-      padding-left: 20px;
+
+    /* Transition effects */
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
     }
-    .game-info {
-      display: flex;
-      justify-content: space-around;
-      background: #f9f9f9;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+
+    .slide-in {
+      animation: slideIn 0.5s ease forwards;
     }
-    .game-info p {
-      margin: 5px 0;
-      font-size: clamp(0.9rem, 4vw, 1rem);
-      flex: 1 1 auto;
-    }
-    .note {
-      background-color: #fffde7;
-      border-left: 4px solid #fbc02d;
-      padding: 10px 15px;
-      margin-top: 15px;
-      font-size: clamp(0.8rem, 3.5vw, 0.9rem);
-      text-align: left;
-    }
+
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
     }
-    @keyframes scoreUpdate {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.5); }
-      100% { transform: scale(1); }
+
+    @keyframes slideIn {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
-    #scoreDisplay {
-      transition: color 0.5s;
+
+    /* Score breakdown styling */
+    .final-stats {
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+
+    .score-breakdown {
+      display: flex;
+      justify-content: space-around;
+      gap: 15px;
+      margin: 20px 0;
     }
     
-    /* Mobile-specific styles */
-    @media (max-width: 480px) {
+    .part-stats {
+      background-color: rgba(52, 152, 219, 0.05);
+      border-radius: 8px;
+      padding: 15px;
+      flex: 1;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    
+    .part-stats h4 {
+      color: var(--primary-color);
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+    
+    .part-stats p {
+      margin: 5px 0;
+    }
+
+    /* Enhanced mobile responsiveness */
+    @media (max-width: 600px) {
       body {
-        padding: 0;
+        padding: 10px;
       }
+      
       .game-container {
-        border-radius: 0;
-        padding: 15px 10px;
-        min-height: 100vh;
+        padding: 15px;
+        border-radius: 12px;
+        max-width: 100%;
       }
+
+      .cup-btn {
+        padding: 30px 10px;
+        min-width: 80px;
+        margin-bottom: 5px;
+      }
+      
       .cup-buttons {
+        gap: 10px;
+      }
+      
+      h2 {
+        font-size: 22px;
+      }
+
+      .game-info {
+        flex-direction: column;
         gap: 5px;
       }
-      .cup-btn {
+      
+      .how-to-play {
         padding: 10px;
-        min-width: 80px;
-        display: flex;
+        font-size: 14px;
+      }
+      
+      .button-container {
         flex-direction: column;
+        gap: 10px;
       }
-      .cup-btn:before {
-        content: '🥤';
-        font-size: 1.5em;
-        margin-bottom: 5px;
-      }
+      
       .btn {
-        width: calc(50% - 10px);
-        max-width: 150px;
-        margin: 5px;
+        width: 100%;
+        padding: 15px;
       }
-      .how-to-play {
-        padding: 10px;
-      }
-      .note {
-        font-size: 12px;
-        padding: 8px;
-      }
-    }
-    
-    /* iPad/Tablet styles */
-    @media (min-width: 481px) and (max-width: 768px) {
-      .game-container {
-        padding: 20px;
-      }
-      .cup-btn {
-        min-width: 110px;
-      }
-      .cup-btn:before {
-        content: '🥤';
-        font-size: 1.5em;
-        margin-bottom: 5px;
-      }
-    }
-    
-    /* Landscape orientation for mobile */
-    @media (max-height: 500px) and (orientation: landscape) {
-      body {
-        padding: 5px;
-      }
-      .game-container {
-        padding: 10px;
-      }
-      .cup-buttons {
-        margin-bottom: 10px;
-      }
-      .how-to-play {
-        max-height: 150px;
-        overflow-y: auto;
-        font-size: 0.8rem;
-      }
-      .game-info {
-        margin-bottom: 10px;
-        padding: 5px;
-      }
-      .note {
-        font-size: 0.75rem;
-        padding: 8px;
+      
+      .score-breakdown {
+        flex-direction: column;
       }
     }
   </style>
@@ -274,16 +416,16 @@
 <body>
 
 <div class="game-container">
-  <h2 id="gameTitle">Cup Gamble Game - Part 1</h2>
+  <h2 id="gameTitle" class="slide-in">Cup Gamble Game - Part 1</h2>
 
-  <div id="instructions" class="how-to-play"></div>
+  <div id="instructions" class="how-to-play fade-in"></div>
 
-  <div class="game-info">
+  <div class="game-info slide-in">
     <p><strong>Round:</strong> <span id="roundDisplay">1</span>/5</p>
     <p><strong>Score:</strong> <span id="scoreDisplay">0</span> <span id="scoreChange" class="score-change"></span></p>
   </div>
 
-  <div id="gameArea">
+  <div id="gameArea" class="fade-in">
     <p id="prompt">Pick a cup:</p>
     <div class="cup-buttons" id="cupButtons"></div>
     <div class="button-container">
@@ -293,13 +435,13 @@
     <div class="result" id="resultMsg"></div>
   </div>
 
-  <div id="finalArea" class="hidden">
+  <div id="finalArea" class="hidden fade-in">
     <h3>End of Part 1</h3>
     <p id="finalMessage"></p>
     <button class="btn" id="startPart2Btn">Start Part 2</button>
   </div>
 
-  <div id="endGameArea" class="hidden">
+  <div id="endGameArea" class="hidden fade-in">
     <h3>Game Completed!</h3>
     <p id="endMessage"></p>
     <button class="btn" id="restartBtn">Restart Game</button>
@@ -307,7 +449,7 @@
 </div>
 
 <script>
-  // Game state
+  // Game state management using a single object
   const gameState = {
     part: 1,
     round: 1,
@@ -319,11 +461,24 @@
     part1Skipped: 0,
     part2Played: 0,
     part2Skipped: 0,
-    part1CupMap: [2, 3, 5, 3, 5], // New variable for Part 1 cup count
-    part2CupMap: [2, 3, 5, 3, 5]  // Keep the same for Part 2
+    part1CupMap: [2, 3, 5, 3, 5],
+    part2CupMap: [2, 3, 5, 3, 5],
+    revealDelay: 600, // Animation timing
   };
 
-  // Cache DOM elements
+  // Configuration data
+  const gameConfig = {
+    rewardMapPart1: [2, 3, 5, 5, 3],
+    penaltyMapPart2: [
+      { safe: 1, penalties: [-2, -2] },
+      { safe: 1, penalties: [-3, -3] },
+      { safe: 1, penalties: [-5, -5, -5, -5] },
+      { safe: 1, penalties: [-5, -5] },
+      { safe: 1, penalties: [-3, -3, -3, -3] }
+    ]
+  };
+
+  // DOM element references (cached for performance)
   const elements = {
     instructions: document.getElementById("instructions"),
     roundDisplay: document.getElementById("roundDisplay"),
@@ -342,28 +497,30 @@
     endMessage: document.getElementById("endMessage")
   };
 
-  // Add event listeners
+  // Event listeners
   elements.playBtn.addEventListener("click", playRound);
   elements.skipBtn.addEventListener("click", skipRound);
   document.getElementById("startPart2Btn").addEventListener("click", startPart2);
   document.getElementById("restartBtn").addEventListener("click", () => location.reload());
 
-  // Helper functions
+  /**
+   * Displays game instructions based on current part
+   */
   function showInstructions() {
     const whatsappNote = `
       <div class="note">
         <strong>Important:</strong> Participants are requested to screenshot the end result and send it on WhatsApp to 9665526369.
       </div>
     `;
-    
+
     if (gameState.part === 1) {
       elements.instructions.innerHTML = `
         <h3>How to Play - Part 1</h3>
         <ul>
-          <li>Each round has a different number of cups, but only one has a winning token.</li>
-          <li>Select the correct cup: +3 points</li>
-          <li>Wrong guess: 0 points</li>
-          <li>Skip the round: +1 point guaranteed</li>
+          <li>Each round has one correct cup with points.</li>
+          <li>Correct guess = variable reward per question</li>
+          <li>Wrong guess = 0 points</li>
+          <li>Skip = +1 point guaranteed</li>
           <li>Participants may choose to either attempt or skip any question at their discretion</li>
         </ul>
         ${whatsappNote}
@@ -373,10 +530,8 @@
         <h3>How to Play - Part 2</h3>
         <ul>
           <li>You start with 20 points.</li>
-          <li>Each round has a different number of cups.</li>
-          <li>Only 1 cup is safe (0), others have random negative values (-2 to -5).</li>
-          <li>Select a cup: score is reduced by the selected cup's value.</li>
-          <li>Skip: lose 1 point guaranteed.</li>
+          <li>Each round has 1 safe cup (0), others cost points.</li>
+          <li>Skip = lose 1 point</li>
           <li>Participants may choose to either attempt or skip any question at their discretion</li>
         </ul>
         ${whatsappNote}
@@ -384,25 +539,42 @@
     }
   }
 
+  /**
+   * Renders cup buttons based on count
+   * @param {number} count - Number of cups to render
+   */
   function renderCups(count) {
     elements.cupButtons.innerHTML = "";
+    
     for (let i = 1; i <= count; i++) {
       const btn = document.createElement("button");
-      btn.className = "cup-btn";
-      btn.innerHTML = `🥤 Cup ${i}`;
+      btn.className = "cup-btn fade-in";
+      btn.innerHTML = `Cup ${i}`;
       btn.dataset.cupId = i;
+      btn.style.animationDelay = `${i * 0.1}s`;
       elements.cupButtons.appendChild(btn);
     }
 
-    // Event delegation for cup buttons
-    elements.cupButtons.addEventListener("click", (e) => {
-      if (e.target.classList.contains("cup-btn")) {
-        const cupId = parseInt(e.target.dataset.cupId);
-        selectCup(cupId, e.target);
-      }
-    });
+    // Add delegated event listener
+    elements.cupButtons.addEventListener("click", cupClickHandler);
   }
 
+  /**
+   * Event handler for cup button clicks
+   * @param {Event} e - Click event
+   */
+  function cupClickHandler(e) {
+    if (e.target.classList.contains("cup-btn")) {
+      const cupId = parseInt(e.target.dataset.cupId);
+      selectCup(cupId, e.target);
+    }
+  }
+
+  /**
+   * Handles cup selection
+   * @param {number} cupId - Selected cup ID
+   * @param {HTMLElement} btnElement - Button element clicked
+   */
   function selectCup(cupId, btnElement) {
     gameState.selectedCup = cupId;
     document.querySelectorAll(".cup-btn").forEach(b => b.classList.remove("selected"));
@@ -410,6 +582,9 @@
     elements.playBtn.disabled = false;
   }
 
+  /**
+   * Updates game display elements
+   */
   function updateDisplay() {
     elements.roundDisplay.textContent = gameState.round;
     elements.scoreDisplay.textContent = gameState.score;
@@ -419,140 +594,276 @@
     elements.scoreChange.textContent = "";
   }
 
+  /**
+   * Shows score change animation
+   * @param {number} amount - Score change amount
+   */
   function showScoreChange(amount) {
     elements.scoreChange.textContent = amount > 0 ? `+${amount}` : amount;
-    elements.scoreChange.style.color = amount > 0 ? "#27ae60" : amount < 0 ? "#c0392b" : "#7f8c8d";
+    elements.scoreChange.style.color = amount > 0 ? 
+      "var(--success-color)" : amount < 0 ? 
+      "var(--error-color)" : "var(--neutral-color)";
     
     // Reset animation
     elements.scoreChange.style.animation = 'none';
-    elements.scoreChange.offsetHeight; // Trigger reflow
-    elements.scoreChange.style.animation = 'scoreUpdate 1s';
+    elements.scoreChange.offsetHeight; // Force reflow
+    elements.scoreChange.style.animation = 'scoreUpdate 1.5s';
   }
 
+  /**
+   * Reveals the correct cup with animation
+   * @param {number} correctCup - The correct cup number
+   * @param {boolean} isSuccess - Whether player selected correctly
+   */
+  function revealCup(correctCup, isSuccess) {
+    const cupButtons = document.querySelectorAll('.cup-btn');
+    
+    // Remove click event temporarily
+    elements.cupButtons.removeEventListener('click', cupClickHandler);
+    
+    // Add visual feedback
+    cupButtons.forEach((btn, i) => {
+      const cupId = parseInt(btn.dataset.cupId);
+      
+      if (cupId === correctCup) {
+        setTimeout(() => {
+          btn.classList.add('reveal-success');
+        }, gameState.revealDelay);
+      } else if (cupId === gameState.selectedCup && !isSuccess) {
+        setTimeout(() => {
+          btn.classList.add('reveal-error');
+        }, gameState.revealDelay);
+      }
+    });
+    
+    // Show result message with delay
+    setTimeout(() => {
+      elements.resultMsg.classList.add('active');
+    }, gameState.revealDelay * 2);
+    
+    // Re-enable cup buttons and advance after animations
+    setTimeout(() => {
+      advanceRound();
+    }, gameState.revealDelay * 3.5);
+  }
+
+  /**
+   * Handles play button click
+   */
   function playRound() {
     if (gameState.selectedCup === 0) return;
     
-    // Get the number of cups for the current round based on which part we're in
-    const totalCups = (gameState.part === 1) ? 
-                       gameState.part1CupMap[gameState.round - 1] : 
-                       gameState.part2CupMap[gameState.round - 1];
+    elements.playBtn.disabled = true;
+    elements.skipBtn.disabled = true;
     
-    let correct = Math.floor(Math.random() * totalCups) + 1;
+    const roundIdx = gameState.round - 1;
+    const totalCups = gameState.part === 1 ? 
+      gameState.part1CupMap[roundIdx] : 
+      gameState.part2CupMap[roundIdx];
+    const selected = gameState.selectedCup;
 
     if (gameState.part === 1) {
       gameState.part1Played++;
-      if (gameState.selectedCup === correct) {
-        showScoreChange(+3);
-        gameState.score += 3;
-        elements.resultMsg.textContent = "Correct! +3 points.";
+      const correct = Math.floor(Math.random() * totalCups) + 1;
+      const reward = gameConfig.rewardMapPart1[roundIdx];
+
+      if (selected === correct) {
+        gameState.score += reward;
+        showScoreChange(+reward);
+        elements.resultMsg.textContent = `Correct! +${reward} points.`;
         elements.resultMsg.className = "result success";
+        revealCup(correct, true);
       } else {
         showScoreChange(0);
         elements.resultMsg.textContent = `Wrong! Correct cup was ${correct}. +0 points.`;
         elements.resultMsg.className = "result error";
+        revealCup(correct, false);
       }
     } else {
       gameState.part2Played++;
-      const penalties = Array.from({length: totalCups}, () => -Math.floor(Math.random() * 4 + 2));
-      penalties[correct - 1] = 0;
-      const deduction = penalties[gameState.selectedCup - 1];
+      const setup = gameConfig.penaltyMapPart2[roundIdx];
+      const penalties = [...setup.penalties];
+      const safeIndex = Math.floor(Math.random() * totalCups);
+      const outcomes = Array(totalCups).fill(0).map((_, i) => i === safeIndex ? 0 : penalties[i % penalties.length]);
       
-      showScoreChange(deduction);
+      const deduction = outcomes[selected - 1];
       gameState.score += deduction;
+      showScoreChange(deduction);
       
-      elements.resultMsg.textContent = deduction === 0 ? 
-        "Safe! No point lost." : 
-        `Bad luck! You lost ${-deduction} points.`;
-      elements.resultMsg.className = deduction === 0 ? "result success" : "result error";
+      if (deduction === 0) {
+        elements.resultMsg.textContent = "Safe! No point lost.";
+        elements.resultMsg.className = "result success";
+        revealCup(selected, true);
+      } else {
+        elements.resultMsg.textContent = `Oops! You lost ${-deduction} points.`;
+        elements.resultMsg.className = "result error";
+        revealCup(safeIndex + 1, false);
+      }
     }
-
-    advanceRound();
   }
 
+  /**
+   * Handles skip button click
+   */
   function skipRound() {
+    elements.playBtn.disabled = true;
+    elements.skipBtn.disabled = true;
+    
     if (gameState.part === 1) {
-      showScoreChange(+1);
       gameState.score += 1;
       gameState.part1Skipped++;
-      elements.resultMsg.textContent = "+1 point for skipping.";
-      elements.resultMsg.className = "result neutral";
+      showScoreChange(+1);
+      elements.resultMsg.textContent = "Skipped! +1 point.";
+      elements.resultMsg.className = "result";
     } else {
-      showScoreChange(-1);
       gameState.score -= 1;
       gameState.part2Skipped++;
-      elements.resultMsg.textContent = "-1 point for skipping.";
-      elements.resultMsg.className = "result error";
+      showScoreChange(-1);
+      elements.resultMsg.textContent = "Skipped! -1 point.";
+      elements.resultMsg.className = "result";
     }
-    advanceRound();
+
+    // Show result message with animation
+    elements.resultMsg.classList.add('active');
+    
+    // Advance after animations
+    setTimeout(() => {
+      advanceRound();
+    }, 1000);
   }
 
+  /**
+   * Advances to next round or ends game
+   */
   function advanceRound() {
-    gameState.selectedCup = 0;
-    gameState.round++;
-    
-    if ((gameState.part === 1 && gameState.round > 5) || (gameState.part === 2 && (gameState.round > 5 || gameState.score <= 0))) {
+    if (gameState.round === 5) {
       if (gameState.part === 1) {
         gameState.part1Score = gameState.score;
+        
+        // Show end of part 1 with animation
         elements.gameArea.classList.add("hidden");
         elements.finalArea.classList.remove("hidden");
-        elements.finalMessage.innerText = `Part 1 Score: ${gameState.part1Score}`;
+        
+        elements.finalMessage.innerHTML = `
+          <div class="slide-in" style="animation-delay: 0.2s">
+            <p class="final-stats">Part 1 Complete!</p>
+            <p>Score: <strong>${gameState.part1Score}</strong></p>
+            <p>Questions Played: ${gameState.part1Played} | Skipped: ${gameState.part1Skipped}</p>
+          </div>
+        `;
       } else {
-        gameState.part2Score = gameState.score;
+        gameState.part2Score = gameState.score - gameState.part1Score;
+        
+        // Show end of game with animation
         elements.gameArea.classList.add("hidden");
         elements.endGameArea.classList.remove("hidden");
-
+        
         elements.endMessage.innerHTML = `
-          <p><strong>Final Score:</strong></p>
-          <p>Part 1: ${gameState.part1Score} points</p>
-          <p>Part 2: ${gameState.part2Score} points</p>
-          <hr/>
-          <p><strong>Stats:</strong></p>
-          <p>Part 1 - Played: ${gameState.part1Played}, Skipped: ${gameState.part1Skipped}</p>
-          <p>Part 2 - Played: ${gameState.part2Played}, Skipped: ${gameState.part2Skipped}</p>
-          <hr/>
-          <p><strong>Total Score:</strong> ${gameState.part1Score + gameState.part2Score} points</p>
+          <div class="slide-in" style="animation-delay: 0.2s">
+            <p class="final-stats">Final Score: <strong>${gameState.score}</strong></p>
+            <div class="score-breakdown">
+              <div class="part-stats">
+                <h4>Part 1</h4>
+                <p>Score: <strong>${gameState.part1Score}</strong></p>
+                <p>Played: ${gameState.part1Played} | Skipped: ${gameState.part1Skipped}</p>
+              </div>
+              <div class="part-stats">
+                <h4>Part 2</h4>
+                <p>Score: <strong>${gameState.part2Score}</strong></p>
+                <p>Played: ${gameState.part2Played} | Skipped: ${gameState.part2Skipped}</p>
+              </div>
+            </div>
+          </div>
         `;
       }
     } else {
-      setTimeout(() => {
-        startRound();
-      }, 1500); // Delay to allow player to see results
+      gameState.round++;
+      gameState.selectedCup = 0;
+      startRound();
     }
   }
 
+  /**
+   * Sets up a new round
+   */
+  function startRound() {
+    showInstructions();
+
+    const roundIdx = gameState.round - 1;
+    const totalCups = gameState.part === 1 ? 
+      gameState.part1CupMap[roundIdx] : 
+      gameState.part2CupMap[roundIdx];
+
+    // Reset cup buttons
+    const newButtons = elements.cupButtons.cloneNode(false);
+    elements.cupButtons.parentNode.replaceChild(newButtons, elements.cupButtons);
+    elements.cupButtons = newButtons;
+
+    // Reset UI state
+    elements.playBtn.disabled = true;
+    elements.skipBtn.disabled = false;
+    elements.resultMsg.className = "result";
+    elements.resultMsg.textContent = "";
+    
+    renderCups(totalCups);
+    updateDisplay();
+
+    if (gameState.part === 1) {
+      const reward = gameConfig.rewardMapPart1[roundIdx];
+      elements.prompt.textContent = `Pick a cup (1 to ${totalCups}): 1 correct cup = +${reward} points. Wrong = 0. Skip = +1.`;
+    } else {
+      const penalties = gameConfig.penaltyMapPart2[roundIdx].penalties;
+      const worst = Math.min(...penalties);
+      elements.prompt.textContent = `Pick a cup (1 to ${totalCups}): 1 safe cup = 0. Others up to ${worst} loss. Skip = -1.`;
+    }
+  }
+
+  /**
+   * Starts part 2 of the game
+   */
   function startPart2() {
     gameState.part = 2;
     gameState.round = 1;
-    gameState.score = 20;
     gameState.selectedCup = 0;
+    gameState.score += 20;
+
     elements.finalArea.classList.add("hidden");
     elements.gameArea.classList.remove("hidden");
     elements.gameTitle.textContent = "Cup Gamble Game - Part 2";
     startRound();
   }
 
-  function startRound() {
-    showInstructions();
+  /**
+   * Initialize touch events for mobile
+   */
+  function initTouchEvents() {
+    // Add "touchstart" event listener to buttons for better mobile response
+    document.querySelectorAll(".btn").forEach(btn => {
+      btn.addEventListener("touchstart", function() {
+        this.classList.add("touch-active");
+      }, { passive: true });
+      
+      btn.addEventListener("touchend", function() {
+        this.classList.remove("touch-active");
+      }, { passive: true });
+    });
     
-    // Get cup count for current round based on which part we're in
-    const totalCups = (gameState.part === 1) ? 
-                       gameState.part1CupMap[gameState.round - 1] : 
-                       gameState.part2CupMap[gameState.round - 1];
-    
-    // Clear existing event listeners before rendering new cups
-    const oldCupButtons = elements.cupButtons;
-    const newCupButtons = oldCupButtons.cloneNode(false);
-    oldCupButtons.parentNode.replaceChild(newCupButtons, oldCupButtons);
-    elements.cupButtons = newCupButtons;
-    
-    renderCups(totalCups);
-    updateDisplay();
-    elements.prompt.textContent = `Pick a cup (1 to ${totalCups}):`;
+    // Add fastclick-like behavior to reduce mobile tap delay
+    document.addEventListener("touchstart", function(){}, { passive: true });
   }
 
-  // Start the game
-  startRound();
+  // Initialize the game
+  window.onload = function() {
+    startRound();
+    initTouchEvents();
+    
+    // Add orientation change handler for mobile
+    window.addEventListener("orientationchange", function() {
+      setTimeout(function() {
+        window.scrollTo(0, 0);
+      }, 300);
+    });
+  };
 </script>
-
 </body>
 </html>
