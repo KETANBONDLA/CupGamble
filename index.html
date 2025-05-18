@@ -4,42 +4,56 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cup Gamble Game</title>
+  <meta name="theme-color" content="#3498db">
   <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       text-align: center;
-      padding: 20px;
+      padding: 10px;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       margin: 0;
+      line-height: 1.6;
     }
     .game-container {
       background: white;
-      padding: 30px;
+      padding: min(30px, 5vw);
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.12);
       max-width: 650px;
       width: 100%;
+      overflow-x: hidden;
     }
     h2 {
       color: #2c3e50;
       margin-top: 0;
       margin-bottom: 20px;
+      font-size: clamp(1.5rem, 5vw, 2rem);
+    }
+    h3 {
+      font-size: clamp(1.2rem, 4vw, 1.5rem);
     }
     .btn {
-      padding: 12px 24px;
-      margin: 10px;
+      padding: min(12px, 3vw) min(24px, 6vw);
+      margin: 10px 5px;
       border: none;
       border-radius: 8px;
       background: #3498db;
       color: white;
-      font-size: 16px;
+      font-size: clamp(0.9rem, 4vw, 1rem);
       cursor: pointer;
       transition: all 0.3s ease;
       box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      touch-action: manipulation;
+      -webkit-appearance: none;
+      user-select: none;
     }
     .btn:hover {
       background: #2980b9;
@@ -60,18 +74,27 @@
       justify-content: center;
       flex-wrap: wrap;
       margin-bottom: 20px;
-      gap: 15px;
+      gap: min(15px, 2vw);
     }
     .cup-btn {
+      flex: 1 0 calc(33.333% - 20px);
+      min-width: min(100px, 25vw);
+      max-width: min(150px, 40vw);
       margin: 5px;
-      font-size: 20px;
+      font-size: clamp(0.9rem, 4vw, 1.25rem);
       background: #f8f9fa;
       border: 2px solid #dee2e6;
       color: #333;
       border-radius: 8px;
-      padding: 15px 20px;
+      padding: min(15px, 4vw) min(20px, 5vw);
       cursor: pointer;
       transition: all 0.2s ease;
+      touch-action: manipulation;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
     }
     .cup-btn:hover {
       transform: translateY(-3px);
@@ -83,15 +106,21 @@
       transform: translateY(-3px);
       box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
     .result {
       margin: 15px 0;
       font-weight: bold;
       padding: 10px;
       border-radius: 8px;
       animation: fadeIn 0.5s;
+      font-size: clamp(0.9rem, 4vw, 1rem);
     }
     .score-change {
-      font-size: 24px;
+      font-size: clamp(1.2rem, 5vw, 1.5rem);
       font-weight: bold;
       animation: scoreUpdate 1s;
       display: inline-block;
@@ -119,6 +148,13 @@
       padding: 15px;
       border-radius: 8px;
       border-left: 4px solid #3498db;
+      font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+    }
+    .how-to-play h3 {
+      margin-top: 0;
+    }
+    .how-to-play ul {
+      padding-left: 20px;
     }
     .game-info {
       display: flex;
@@ -127,16 +163,19 @@
       padding: 10px;
       border-radius: 8px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
     .game-info p {
       margin: 5px 0;
+      font-size: clamp(0.9rem, 4vw, 1rem);
+      flex: 1 1 auto;
     }
     .note {
       background-color: #fffde7;
       border-left: 4px solid #fbc02d;
       padding: 10px 15px;
       margin-top: 15px;
-      font-size: 14px;
+      font-size: clamp(0.8rem, 3.5vw, 0.9rem);
       text-align: left;
     }
     @keyframes fadeIn {
@@ -151,16 +190,215 @@
     #scoreDisplay {
       transition: color 0.5s;
     }
-    @media (max-width: 600px) {
+    
+    /* Mobile-specific styles */
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+      }
       .game-container {
-        padding: 15px;
+        border-radius: 0;
+        padding: 15px 10px;
+        min-height: 100vh;
       }
       .cup-buttons {
         gap: 5px;
       }
       .cup-btn {
-        font-size: 16px;
-        padding: 10px 15px;
+        padding: 10px;
+        min-width: 80px;
+        display: flex;
+        flex-direction: column;
+      }
+      .cup-btn:before {
+        content: '🥤';
+        font-size: 1.5em;
+        margin-bottom: 5px;
+      }
+      .btn {
+        width: calc(50% - 10px);
+        max-width: 150px;
+        margin: 5px;
+      }
+      .how-to-play {
+        padding: 10px;
+      }
+      .note {
+        font-size: 12px;
+        padding: 8px;
+      }
+    }
+    
+    /* iPad/Tablet styles */
+    @media (min-width: 481px) and (max-width: 768px) {
+      .game-container {
+        padding: 20px;
+      }
+      .cup-btn {
+        min-width: 110px;
+      }
+      .cup-btn:before {
+        content: '🥤';
+        font-size: 1.5em;
+        margin-bottom: 5px;
+      }
+    }
+    
+    /* Landscape orientation for mobile */
+    @media (max-height: 500px) and (orientation: landscape) {
+      body {
+        padding: 5px;
+      }
+      .game-container {
+        padding: 10px;
+      }
+      .cup-buttons {
+        margin-bottom: 10px;
+      }
+      .how-to-play {
+        max-height: 150px;
+        overflow-y: auto;
+        font-size: 0.8rem;
+      }
+      .game-info {
+        margin-bottom: 10px;
+        padding: 5px;
+      }
+      .note {
+        font-size: 0.75rem;
+        padding: 8px;
+      }
+    }}
+    .error {
+      background-color: rgba(231, 76, 60, 0.2);
+      color: #c0392b;
+    }
+    .neutral {
+      background-color: rgba(189, 195, 199, 0.2);
+      color: #7f8c8d;
+    }
+    .hidden {
+      display: none;
+    }
+    .how-to-play {
+      text-align: left;
+      margin-bottom: 20px;
+      background: #f0f8ff;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+      font-size: clamp(0.85rem, 3.5vw, 0.95rem);
+    }
+    .how-to-play h3 {
+      margin-top: 0;
+    }
+    .how-to-play ul {
+      padding-left: 20px;
+    }
+    .game-info {
+      display: flex;
+      justify-content: space-around;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .game-info p {
+      margin: 5px 0;
+      font-size: clamp(0.9rem, 4vw, 1rem);
+      flex: 1 1 auto;
+    }
+    .note {
+      background-color: #fffde7;
+      border-left: 4px solid #fbc02d;
+      padding: 10px 15px;
+      margin-top: 15px;
+      font-size: clamp(0.8rem, 3.5vw, 0.9rem);
+      text-align: left;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scoreUpdate {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.5); }
+      100% { transform: scale(1); }
+    }
+    #scoreDisplay {
+      transition: color 0.5s;
+    }
+    
+    /* Mobile-specific styles */
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+      }
+      .game-container {
+        border-radius: 0;
+        padding: 15px 10px;
+        min-height: 100vh;
+      }
+      .cup-buttons {
+        gap: 5px;
+      }
+      .cup-btn {
+        padding: 10px;
+        min-width: 80px;
+        display: flex;
+        flex-direction: column;
+      }
+      .cup-btn:before {
+        margin-bottom: 3px;
+      }
+      .btn {
+        width: calc(50% - 10px);
+        max-width: 150px;
+        margin: 5px;
+      }
+      .how-to-play {
+        padding: 10px;
+      }
+      .note {
+        font-size: 12px;
+        padding: 8px;
+      }
+    }
+    
+    /* iPad/Tablet styles */
+    @media (min-width: 481px) and (max-width: 768px) {
+      .game-container {
+        padding: 20px;
+      }
+      .cup-btn {
+        min-width: 110px;
+      }
+    }
+    
+    /* Landscape orientation for mobile */
+    @media (max-height: 500px) and (orientation: landscape) {
+      body {
+        padding: 5px;
+      }
+      .game-container {
+        padding: 10px;
+      }
+      .cup-buttons {
+        margin-bottom: 10px;
+      }
+      .how-to-play {
+        max-height: 150px;
+        overflow-y: auto;
+        font-size: 0.8rem;
+      }
+      .game-info {
+        margin-bottom: 10px;
+        padding: 5px;
+      }
+      .note {
+        font-size: 0.75rem;
+        padding: 8px;
       }
     }
   </style>
@@ -180,7 +418,7 @@
   <div id="gameArea">
     <p id="prompt">Pick a cup:</p>
     <div class="cup-buttons" id="cupButtons"></div>
-    <div>
+    <div class="button-container">
       <button class="btn" id="playBtn" disabled>Play</button>
       <button class="btn" id="skipBtn">Skip</button>
     </div>
